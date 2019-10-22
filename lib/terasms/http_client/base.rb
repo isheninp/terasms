@@ -1,30 +1,21 @@
 require 'net/http'
 require 'uri'
-require 'json'
 
 module Terasms
-    module HttpClient
-
-    def http_post url, params
-  
-        uri = URI.parse("http://localhost:3000/users")
-        header = {'Content-Type': 'text/json'}
-
-        user = {user: {
-                          name: 'Bob',
-                           email: 'bob@example.com'
-                              }
-                    }
-        
-        # Create the HTTP objects
+  class HttpClient
+    def submit url, params
+      begin
+        uri = URI.parse(url)
+        uri.query = URI.encode_www_form(params)
+        header = {'Content-Type': 'text/html'}
         http = Net::HTTP.new(uri.host, uri.port)
-        request = Net::HTTP::Post.new(uri.request_uri, header)
-        request.body = user.to_json
-        
-        # Send the request
-        response = http.request(request)
-    
-
+        http.use_ssl = true
+        http.read_timeout = 10
+        request = Net::HTTP::Get.new(uri.request_uri, header)
+        http.request(request).body
+      rescue => error
+        error.to_s
+      end
     end
-  end    
+  end
 end
