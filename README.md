@@ -20,4 +20,4 @@ api = Terasms::Sms.new
 result = api.send({target: "+77501112233", message: "Привет Мир! Тест рассылки смс"})
 ```
 ### License
-MIT License. Copyright 2016-2017 isheninp@gmail.com
+MIT License. Copyright 2019 isheninp@gmail.com
