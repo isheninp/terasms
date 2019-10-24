@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
     s.name        = 'terasms'
-    s.version     = '1.0.1'
-    s.date        = '2019-10-22'
+    s.version     = '1.0.2'
+    s.date        = '2019-10-24'
     s.summary     = "Terasms sms messaging"
     s.description = "Terasms http rest api "
     s.authors     = ["Pavel Ishenin"]
