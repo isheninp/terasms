@@ -77,6 +77,7 @@
 require 'rubygems'
 require 'ostruct'
 require 'terasms/http_client/base'
+require 'json'
   
 module Terasms
   
@@ -92,50 +93,74 @@ module Terasms
   class Sms < HttpClient
 
     ERRORS = {
-      '-1' => 'Неверный логин или пароль',
-      '-20' => 'Пустой текст сообщения',
-      '-30' => 'Пустой номер абонента',
-      '-40' => 'Неправильно задан номер абонента',
-      '-45' => 'Превышено количество номеров',
-      '-50' => 'Неправильно задано имя отправителя',
-      '-60' => 'Рассылка по данному направлению недоступна',
-      '-70' => 'Недостаточно средств на счете',
-      '-80' => 'Не установлена стоимость рассылки по данному направлению',
-      '-90' => 'Рассылка запрещена',
-      '-100' => 'Не указаны необходимые параметры',
-      '-110' => 'Номер в черном списке',
-      '-120' => 'Некорректно задано время отложенной отправки',
-      '-130' => 'Некорректно задано временное окно отправки',
-      '-140' => 'Передан некорректный ID рассылки',
-      '-160' => 'Превышен дневной лимит рассылки (Вы можете установить максимальную сумму ежедневной рассылки после согласования с Вашим менеджером)',
+      -1 => 'Неверный логин или пароль',
+      -20 => 'Пустой текст сообщения',
+      -30 => 'Пустой номер абонента',
+      -40 => 'Неправильно задан номер абонента',
+      -45 => 'Превышено количество номеров',
+      -50 => 'Неправильно задано имя отправителя',
+      -60 => 'Рассылка по данному направлению недоступна',
+      -70 => 'Недостаточно средств на счете',
+      -80 => 'Не установлена стоимость рассылки по данному направлению',
+      -90 => 'Рассылка запрещена',
+      -100 => 'Не указаны необходимые параметры',
+      -110 => 'Номер в черном списке',
+      -120 => 'Некорректно задано время отложенной отправки',
+      -130 => 'Некорректно задано временное окно отправки',
+      -140 => 'Передан некорректный ID рассылки',
+      -160 => 'Превышен дневной лимит рассылки (Вы можете установить максимальную сумму ежедневной рассылки после согласования с Вашим менеджером)',
     }
 
     def error code
       ERRORS[code]
     end
-  
+
+    def main_status result
+      result["result"]["status"] rescue 'undefined'
+    end
+    
+    def message_status result
+      result["result"]["message_infos"].last["status"] rescue 'undefined'
+    end
+
+    def message_id result
+      result["result"]["message_infos"].last["id"] rescue 'undefined'
+    end
+
     # target, sender, message, 
     # cp, mass_push, delimiter, flash, relative_time, relative_time_read, date_schedule, timezone, time_from, time_to, schedule_id, type
     def send params
-      response = submit Terasms.config.url, Terasms.config.to_h.tap{|hs| hs.delete(:url)}.merge(params)
-      if is_integer? result
-        if response.to_i > 0 
-          result = {status: "success", message_id: result.to_i}
-        else
-          result = {status: "error", description: error(result)}
-        end
+      result = submit Terasms.config.url, {}, 'POST', 'json', Terasms.config.to_h.tap{|hs| hs.delete(:url)}.merge(params).to_json
+      if main_status(result) < 0
+        result.merge!({"info"=> error(main_status(result)), "status"=>"error"}) 
       else
-        result = {status: "error", description: result}
+        if message_status(result) < 0
+          result.merge!({"info"=> error(message_status(result)), "status"=>"error"}) 
+        else
+          result.merge!({"id"=> message_id(result)})
+        end
       end
       result
     end
+    
+    def balance
+      result =  submit Terasms.config.balance_url, {}, 'POST', 'json', Terasms.config.to_h.slice(:login, :password).to_json
+      result.merge!({"info"=> error(main_status(result)), "status"=>"error"}) if main_status(result) < 0
+      result
+    end
 
-    def is_integer? number
-      number.to_i.to_s == number
+    def statuses array_of_id
+      submit(Terasms.config.status_url, {}, 'POST', 'json', Terasms.config.to_h.slice(:login, :password, :sign).merge({'message_ids': array_of_id}).to_json)
+    end
+
+    def status id
+      begin
+        raise 'wrong message id' if statuses([id])["result"]["statuses"] == []
+        {"result"=> "success"}.merge(statuses([id])["result"]["statuses"].last.slice("status", "status_desc"))
+      rescue => error
+        {"result"=> "error", "info" => error.to_s}
+      end
     end
 
   end
 end
-
-
-
