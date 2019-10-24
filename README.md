@@ -3,7 +3,17 @@
 ### Description
 Sending messages via Terasms
 
+### Install:
+
+```ruby
+gem install terasms
+```
+or 
+```ruby
+gem 'terasms', '~> 1.0', '>= 1.0.1'
+```
 ### Usage:
+
 ```ruby
 require 'terasms'
 
