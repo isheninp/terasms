@@ -22,7 +22,10 @@ api = Terasms::Sms.new
 
 puts api.balance # => {"status"=>"success", "result"=>{"status"=>0, "status_description"=>"OK", "balance"=>-36534.651, "pay_type"=>"after"}}
 
-message = api.send({target: "+77501112233", message: "Hello Yarkiy world!"}) # => {"status"=>"success",
+message = api.send({target: "+77501112233", message: "Hello Yarkiy world!"}) 
+
+# =>
+{"status"=>"success",
  "result"=>
   {"status"=>0,
    "status_description"=>"OK",
