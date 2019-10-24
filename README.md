@@ -39,4 +39,4 @@ puts "Message status: #{api.status(1042924450)}" #=> {"result"=>"success", "stat
 
 ```
 ### License
-MIT License. Copyright 2019 isheninp@gmail.com
+MIT License. Copyright 2019 Pavel Ishenin / isheninp@gmail.com
