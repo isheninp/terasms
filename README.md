@@ -10,7 +10,7 @@ gem install terasms
 ```
 or 
 ```ruby
-gem 'terasms', '~> 1.0', '>= 1.0.1'
+gem 'terasms'
 ```
 ### Usage:
 
