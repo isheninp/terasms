@@ -109,6 +109,7 @@ module Terasms
       -130 => 'Некорректно задано временное окно отправки',
       -140 => 'Передан некорректный ID рассылки',
       -160 => 'Превышен дневной лимит рассылки (Вы можете установить максимальную сумму ежедневной рассылки после согласования с Вашим менеджером)',
+      -999 => 'Ошибка обработки ответа API'
     }
 
     def error code
@@ -116,15 +117,15 @@ module Terasms
     end
 
     def main_status result
-      result["result"]["status"] rescue 'undefined'
+      result["result"]["status"] rescue -999
     end
     
     def message_status result
-      result["result"]["message_infos"].last["status"] rescue 'undefined'
+      result["result"]["message_infos"].last["status"] rescue -999
     end
 
     def message_id result
-      result["result"]["message_infos"].last["id"] rescue 'undefined'
+      result["result"]["message_infos"].last["id"] rescue -999
     end
 
     # target, sender, message, 
