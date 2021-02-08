@@ -151,7 +151,7 @@ module Terasms
     end
 
     def statuses array_of_id
-      submit(Terasms.config.status_url, {}, 'POST', 'json', Terasms.config.to_h.slice(:login, :password, :sign).merge({'message_ids': array_of_id}).to_json)
+      submit(Terasms.config.status_url, {}, 'POST', 'json', Terasms.config.to_h.slice(:login, :password, :sign).merge({'message_ids' => array_of_id}).to_json)
     end
 
     def status id
